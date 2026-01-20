@@ -4,7 +4,7 @@ import easyocr
 from pathlib import Path
 
 from fastapi import APIRouter,HTTPException
-from app.services.ocr_services import extract_text
+from app.services.ocr_service import extract_text
 
 ocr_router = APIRouter()
 

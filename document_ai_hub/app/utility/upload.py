@@ -1,5 +1,5 @@
 from fastapi import UploadFile, APIRouter, File
-from document_ai_hub.app.common_utils.file_handler import save_file
+from app.common_utils.file_handler import save_file
 
 upload_router = APIRouter()
 
