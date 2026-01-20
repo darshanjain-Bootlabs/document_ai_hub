@@ -6,9 +6,9 @@ from pathlib import Path
 from fastapi import APIRouter,HTTPException
 from app.services.ocr_services import extract_text
 
-orc_router = APIRouter()
+ocr_router = APIRouter()
 
-@orc_router.post("/extract")
+@ocr_router.post("/extract")
 def ocr_extract_text(file_id: str):
     file_path = Path(file_id)
     if not file_path.exists():
