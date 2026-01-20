@@ -1,5 +1,5 @@
 from pathlib import Path
-from app.utility.ocr import (
+from app.utility.ocr_utils import (
     extract_text_with_tesseract,
     extract_text_with_easyocr
 )
