@@ -1,4 +1,5 @@
 from pathlib import Path
+import shutil
 from langchain_chroma import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.documents import Document
@@ -16,16 +17,28 @@ vector_store = Chroma(
     persist_directory=str(CHROMA_DIR),
     embedding_function=embeddings,
 )
+def reset_vector_store():
+    if CHROMA_DIR.exists():
+        shutil.rmtree(CHROMA_DIR)
+
+    CHROMA_DIR.mkdir(parents=True, exist_ok=True)
+
+    global vector_store
+    vector_store = Chroma(
+        persist_directory=str(CHROMA_DIR),
+        embedding_function=embeddings
+    )
 
 def inject_document(text: str, source: str) ->int:
+    if isinstance(text, list):
+        text = "\n".join(text)
+
     chunks = split_text(text)
-    documents: List[Document] = [
-        Document(
-            page_content=chunk,
-            metadata={"source": source}
-        )
-        for chunk in chunks
-    ]
+    documents: List[Document] = chunks
+
+    for doc in documents:
+        doc.metadata["source"] = source
+    
     vector_store.add_documents(documents)
     return len(documents)
 

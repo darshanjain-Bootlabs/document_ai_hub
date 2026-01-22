@@ -33,4 +33,4 @@ async def upload_file(file: UploadFile = File(...)):
         raise HTTPException(status_code=400, detail="File Handling Error")
     
     chunks = inject_document(text, file.filename)
-    return {"filename": file.filename, "chunks_created": len(chunks)}
+    return {"filename": file.filename, "chunks_created":chunks}

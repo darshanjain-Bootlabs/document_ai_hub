@@ -1,4 +1,4 @@
-import tempfile, io, whisper
+import  io, whisper
 import librosa
 from fastapi import UploadFile
 

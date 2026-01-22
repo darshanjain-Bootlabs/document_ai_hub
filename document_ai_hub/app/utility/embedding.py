@@ -1,5 +1,5 @@
 from fastapi import HTTPException, APIRouter
-from app.services.vector_service import vector_store
+from app.services.vector_service import reset_vector_store, vector_store
 from app.utility.text_splitter import split_text
 
 embedding_router = APIRouter()
@@ -15,3 +15,4 @@ async def generate_embeddings(text: str):
                 }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
