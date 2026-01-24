@@ -1,5 +1,9 @@
-import subprocess
 from app.services.vector_service import similarity_search
+from groq import Groq
+from typing import List
+
+client = Groq()
+MODEL_NAME = "llama3-8b-8192"
 
 def build_context(docs) -> str:
     context_blocks = []
@@ -9,31 +13,6 @@ def build_context(docs) -> str:
         context_blocks.append(block)
     return "\n\n".join(context_blocks)
 
-def call_ollama(prompt: str) -> str:
-    process = subprocess.run(
-        ["ollama","run","tinyllama"], 
-        input = prompt,
-            text = True,
-            capture_output = True
-        )
-    return process.stdout.strip()
-
-def generate_answer(query: str, response_format: str, top_k: int = 3) -> str:
-        docs = similarity_search(query, k=top_k)
-        context = build_context(docs)
-        
-        answer = call_ollama(build_prompt(query, context, response_format))
-        return {
-        "answer": answer,
-        "sources": [
-            {
-                "content": doc.page_content,
-                "metadata": doc.metadata,
-                "format": response_format
-            }
-            for doc in docs
-        ]    
-}
 
 def build_prompt(query: str, context: str, response_format: str) -> str:
     if response_format == "json":
@@ -72,3 +51,32 @@ Question:
 
 {format_instruction}
 """
+
+def generate_answer(query: str, response_format: str, top_k: int = 3) -> str:
+        docs = similarity_search(query, k=top_k)
+        context = build_context(docs)
+        prompt = build_prompt(query, context, response_format)
+        
+        response = client.chat.completions.create(
+            model=MODEL_NAME,
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            temperature=0.2,
+            max_tokens=600,
+        ).choices[0].message.content
+
+        return {
+        "answer": response,
+        "sources": [
+            {
+                "content": doc.page_content,
+                "metadata": doc.metadata,
+                "format": response_format
+            }
+            for doc in docs
+        ]    
+}
