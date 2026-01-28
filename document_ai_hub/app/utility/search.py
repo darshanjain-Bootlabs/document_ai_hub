@@ -1,10 +1,11 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from app.services.vector_service import similarity_search
+from app.utility.auth import get_current_user, require_role
 
 search_router = APIRouter()
 
 @search_router.post("/search")
-def semantic_search(query: str, top_k: int = 3):
+def semantic_search(query: str, top_k: int = 3, user = Depends(require_role(["admin","researcher"]))):
     try:
         docs = similarity_search(query, top_k)
         return {

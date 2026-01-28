@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 from pathlib import Path
 
 from app.services.vector_service import inject_document
@@ -6,12 +6,13 @@ from app.common_utils.pdf_utils import text_from_pdf
 from app.common_utils.txt_utils import text_from_txt
 from app.services.ocr_service import extract_text
 from app.services.whisper_service import text_from_audio
+from app.utility.auth import require_role
 
 upload_router = APIRouter(prefix="/upload", tags=["Upload"])
 SUPPORTED_EXTENSIONS = {".pdf", ".txt", ".png", ".jpg", ".jpeg", ".wav", ".mp3", ".m4a"}
 
 @upload_router.post("/")
-async def upload_file(file: UploadFile = File(...)):
+async def upload_file(file: UploadFile = File(...), file_domain: str = None, current_user = Depends(require_role("admin"))):
     suffix = Path(file.filename).suffix.lower()
 
     if suffix not in SUPPORTED_EXTENSIONS:
@@ -32,5 +33,5 @@ async def upload_file(file: UploadFile = File(...)):
     else:
         raise HTTPException(status_code=400, detail="File Handling Error")
     
-    chunks = inject_document(text, file.filename)
-    return {"filename": file.filename, "chunks_created":chunks}
+    chunks = inject_document(text, file.filename, file_domain)
+    return {"filename": file.filename, "file_domain": file_domain, "chunks_created": chunks}

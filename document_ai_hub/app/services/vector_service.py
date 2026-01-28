@@ -29,7 +29,7 @@ def reset_vector_store():
         embedding_function=embeddings
     )
 
-def inject_document(text: str, source: str) ->int:
+def inject_document(text: str, source: str, file_domain: str = None) ->int:
     if isinstance(text, list):
         text = "\n".join(text)
 
@@ -38,7 +38,9 @@ def inject_document(text: str, source: str) ->int:
 
     for doc in documents:
         doc.metadata["source"] = source
-    
+        if file_domain:
+            doc.metadata["file_domain"] = file_domain
+
     vector_store.add_documents(documents)
     return len(documents)
 
