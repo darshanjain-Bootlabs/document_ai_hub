@@ -4,21 +4,9 @@ from pydantic import BaseModel
 from app.services.user_service import authenticate_user
 from app.utility.auth import create_access_token
 from app.utility.signup import get_db
-from sqlalchemy.orm import Session
-from app.database.session import SessionLocal
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+from sqlalchemy.orm import Session  
 
 auth_router = APIRouter(prefix="/auth", tags=["Auth"])
-
-class LoginRequest(BaseModel):
-    username: str
-    password: str
 
 @auth_router.post("/login")
 def login(request: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):

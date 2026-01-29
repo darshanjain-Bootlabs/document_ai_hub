@@ -11,3 +11,25 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
 settings = Settings()
+
+
+ROLE_DOMAIN_ACCESS = {
+    "doctor": ["healthcare"],
+    "nurse": ["healthcare"],
+    "lawyer": ["legal"],
+    "bank_officer": ["finance"],
+    "student": ["academic"],
+    "business_user": ["business"],
+    "admin": ["healthcare", "legal", "finance", "academic", "business"]
+}
+
+
+MODE_DOMAIN_MAP = {
+    "healthcare_mode": ["healthcare"],
+    "legal_mode": ["legal"],
+    "finance_mode": ["finance"],
+    "academic_mode": ["academic"],
+    "business_mode": ["business"],
+    "general": ["healthcare", "legal", "finance", "academic", "business"]
+
+}

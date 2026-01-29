@@ -4,5 +4,5 @@ from app.utility.auth import get_current_user
 rag_router = APIRouter() 
 
 @rag_router.post("/rag")
-def rag_query(query: str, response_format: str, top_k: int = 3, user: dict = Depends(get_current_user)):
-    return generate_answer(query, top_k=top_k, response_format=response_format)
+def rag_query(query: str, response_format: str, doc_domain: str, user: dict = Depends(get_current_user),mode: str = "general"):
+    return generate_answer(query, response_format=response_format, doc_domain=doc_domain.lower(), user_role=user['role'], mode=mode)

@@ -13,16 +13,15 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 def create_access_token(data: dict):
-    to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    data["exp"] = expire
+    return jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
 
 def require_role(required_role: list[str]):
     def role_checker(user = Depends(get_current_user)):
         if user["role"] not in required_role:
             raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
+                status_code=401,
                 detail="NOT AUTHORIZED TO ACCESS THIS RESOURCE"
             )
         return user
@@ -43,6 +42,6 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
         }
     except JWTError:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=401,
             detail="Could not validate credentials"
         )

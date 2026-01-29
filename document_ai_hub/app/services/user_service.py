@@ -1,9 +1,10 @@
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from app.database.model import UserChunk
+from app.core.config import MODE_DOMAIN_MAP, ROLE_DOMAIN_ACCESS
+from fastapi import HTTPException
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-password = pwd_context.hash("141407")
 
 def create_user(db: Session, username: str, password: str, role: str):
     existing = db.query(UserChunk).filter(UserChunk.user_name == username).first()
@@ -31,3 +32,21 @@ def authenticate_user(db: Session, username: str, password: str):
     if not verify_password(password, user.user_password):
         return None
     return user
+
+def authorize_access(user_role: str, doc_domain: str, mode: str):
+    if doc_domain not in ROLE_DOMAIN_ACCESS.get(user_role, []):
+        raise HTTPException(
+            status_code=403,
+            detail="You are not authorized to access this document"
+        )
+
+    expected_domain = MODE_DOMAIN_MAP.get(mode, [])
+    if doc_domain not in expected_domain:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid mode for this document type"
+        )
+    
+    return True
+    
+    

@@ -8,3 +8,11 @@ class UserChunk(Base):
     user_name = Column(String, index=True, nullable=False)
     user_password = Column(String, nullable=False)
     role = Column(String, index=True, nullable=False)
+
+class DocumentMetaData(Base):
+    __tablename__ = "document_metadata"
+
+    id = Column(Integer, primary_key=True, index=True)
+    document_name = Column(String, index=True, nullable=False)
+    file_domain = Column(String, index=True, nullable=True)
+    uploaded_by = Column(String, index=True, nullable=False)
