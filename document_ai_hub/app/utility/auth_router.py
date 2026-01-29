@@ -5,6 +5,7 @@ from app.services.user_service import authenticate_user
 from app.utility.auth import create_access_token
 from app.utility.signup import get_db
 from sqlalchemy.orm import Session  
+from app.utility.api_key import verify_api_key
 
 auth_router = APIRouter(prefix="/auth", tags=["Auth"])
 

@@ -33,3 +33,9 @@ MODE_DOMAIN_MAP = {
     "general": ["healthcare", "legal", "finance", "academic", "business"]
 
 }
+
+
+VALID_API_KEYS = {
+    "swagger-key-123": "swagger",
+    "frontend-key-456": "frontend"
+}

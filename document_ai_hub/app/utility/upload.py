@@ -1,7 +1,10 @@
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException,Request
 from pathlib import Path
 
 from sqlalchemy.orm import Session
+
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 from app.services.vector_service import inject_document
 from app.common_utils.pdf_utils import text_from_pdf
@@ -16,8 +19,11 @@ from app.utility.signup import get_db
 upload_router = APIRouter(prefix="/upload", tags=["Upload"])
 SUPPORTED_EXTENSIONS = {".pdf", ".txt", ".png", ".jpg", ".jpeg", ".wav", ".mp3", ".m4a"}
 
+limiter = Limiter(key_func=get_remote_address)
+
 @upload_router.post("/")
-async def upload_file(file: UploadFile = File(...), file_domain: str = None, current_user = Depends(get_current_user),db: Session = Depends(get_db)):
+@limiter.limit("5/minutes")
+async def upload_file(request = Request,file: UploadFile = File(...), file_domain: str = None, current_user = Depends(get_current_user),db: Session = Depends(get_db)):
     suffix = Path(file.filename).suffix.lower()
 
 
