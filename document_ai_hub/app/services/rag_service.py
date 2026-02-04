@@ -61,7 +61,7 @@ Treatment Plan: (Specific dosage changes and follow-ups). Ensure you do not conf
     elif mode == "business_mode":
         prompt_mode = "Act as an Executive Secretary. Analyze the provided meeting transcript to produce a high-level executive summary. Your primary output must be a categorized list of 'Action Items,' including who is responsible and the deadline if mentioned. Use bullet points for readability. Omit small talk and focus entirely on decisions made and next steps for the team."
     else:
-        pass
+        prompt_mode = "Act as a helpful assistant. Answer the question based on the provided context."
     
     
     

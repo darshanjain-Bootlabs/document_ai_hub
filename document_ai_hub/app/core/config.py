@@ -15,7 +15,6 @@ settings = Settings()
 
 ROLE_DOMAIN_ACCESS = {
     "doctor": ["healthcare"],
-    "nurse": ["healthcare"],
     "lawyer": ["legal"],
     "bank_officer": ["finance"],
     "student": ["academic"],

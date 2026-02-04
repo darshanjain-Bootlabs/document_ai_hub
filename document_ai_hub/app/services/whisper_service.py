@@ -1,4 +1,4 @@
-import  io, whisper
+import whisper
 import librosa
 import subprocess
 import tempfile
@@ -22,9 +22,7 @@ async def text_from_audio(file: UploadFile) -> str:
         output_path
     ], check=True)
 
-    audio_data, sample_rate = librosa.load(output_path, sr=16000)
-
-    result = model.transcribe(audio_data)
+    result = model.transcribe(output_path)
     return result["text"]
 
 

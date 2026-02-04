@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException,Request
 from pathlib import Path
+import tempfile
+import shutil
 
 from sqlalchemy.orm import Session
 
@@ -23,10 +25,8 @@ limiter = Limiter(key_func=get_remote_address)
 
 @upload_router.post("/")
 @limiter.limit("5/minutes")
-async def upload_file(request = Request,file: UploadFile = File(...), file_domain: str = None, current_user = Depends(get_current_user),db: Session = Depends(get_db)):
+async def upload_file(request: Request, file: UploadFile = File(...), file_domain: str = None, current_user = Depends(get_current_user), db: Session = Depends(get_db)):
     suffix = Path(file.filename).suffix.lower()
-
-
 
     if suffix not in SUPPORTED_EXTENSIONS:
         raise HTTPException(status_code=400, detail="Unsupported file type")
@@ -38,7 +38,16 @@ async def upload_file(request = Request,file: UploadFile = File(...), file_domai
         text = text_from_txt(await file.read())
 
     elif suffix in [".png", ".jpg", ".jpeg"]:
-        text = extract_text(Path(file.filename))
+        with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp_file:
+            tmp_path = tmp_file.name
+            tmp_file.write(await file.read())
+        try:
+            text = extract_text(Path(tmp_path))
+        finally:
+            try:
+                Path(tmp_path).unlink()
+            except:
+                pass
 
     elif suffix in [".wav", ".mp3", ".m4a"]:
         text = await text_from_audio(file)
@@ -53,7 +62,7 @@ async def upload_file(request = Request,file: UploadFile = File(...), file_domai
             db,
             document_name=file.filename,
             file_domain=file_domain,
-            uploaded_by=current_user["username"]
+            uploaded_by=current_user["email"]
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail="Database Error: " + str(e))

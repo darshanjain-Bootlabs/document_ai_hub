@@ -6,11 +6,13 @@ from app.utility.ocr import ocr_router
 from app.utility.embedding import embedding_router
 from app.utility.auth_router import auth_router
 from app.utility.signup import signup_router
+from app.utility.role_update import update_role_router
 
 router = APIRouter()
 
 router.include_router(signup_router)
 router.include_router(auth_router)
+router.include_router(update_role_router, prefix="/role", tags=["Role Update"])
 router.include_router(ocr_router, prefix="/ocr", tags=["OCR"])
 router.include_router(upload_router, prefix="/upload", tags=["Upload"])
 router.include_router(search_router, prefix="/search", tags=["Search"])

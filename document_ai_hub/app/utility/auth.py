@@ -1,6 +1,6 @@
 from jose import jwt, JWTError
 from datetime import datetime, timedelta
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordBearer
 
 import os
@@ -28,18 +28,22 @@ def require_role(required_role: list[str]):
     return role_checker
 
     
-def get_current_user(token: str = Depends(oauth2_scheme)):
+def get_current_user(request: Request, token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
+        email: str = payload.get("sub")
         role: str = payload.get("role")
 
-        if not username or not role:
+        if not email or not role:
             raise HTTPException(status_code=401, detail="Invalid token")
-        return {
-            "username": username,
-            "role": role
-        }
+        user = {
+            "email": email,
+            "role": role,
+       }
+        if request:
+            request.state.user = user
+
+        return user
     except JWTError:
         raise HTTPException(
             status_code=401,
