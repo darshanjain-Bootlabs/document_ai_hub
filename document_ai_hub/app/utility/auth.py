@@ -49,3 +49,4 @@ def get_current_user(request: Request, token: str = Depends(oauth2_scheme)):
             status_code=401,
             detail="Could not validate credentials"
         )
+        

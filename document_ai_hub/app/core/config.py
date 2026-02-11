@@ -19,7 +19,7 @@ ROLE_DOMAIN_ACCESS = {
     "bank_officer": ["finance"],
     "student": ["academic"],
     "business_user": ["business"],
-    "admin": ["healthcare", "legal", "finance", "academic", "business"]
+    "admin": ["healthcare", "legal", "finance", "academic", "business", "general"]
 }
 
 
@@ -29,7 +29,7 @@ MODE_DOMAIN_MAP = {
     "finance_mode": ["finance"],
     "academic_mode": ["academic"],
     "business_mode": ["business"],
-    "general": ["healthcare", "legal", "finance", "academic", "business"]
+    "general": ["healthcare", "legal", "finance", "academic", "business","general"]
 
 }
 

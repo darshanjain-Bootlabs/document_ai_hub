@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from app.services.user_service import authenticate_user
-from app.utility.auth import create_access_token
+from app.utility.auth import create_access_token, get_current_user
 from app.utility.signup import get_db
 from sqlalchemy.orm import Session  
 from app.utility.api_key import verify_api_key
@@ -17,3 +17,10 @@ def login(request: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(
 
     access_token = create_access_token(data={"sub": user.email, "role": user.role})
     return {"access_token": access_token, "token_type": "bearer"}
+
+@auth_router.get("/me")
+def get_me(user: dict = Depends(get_current_user)):
+    return {
+        "username": user["email"],
+        "role": user["role"]
+    }
