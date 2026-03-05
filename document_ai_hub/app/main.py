@@ -41,3 +41,10 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
         content={"detail": "Rate limit exceeded"},
     )
 
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+@app.get("/myself")
+def memy():
+    return {"Name":"Darshan Jain"}

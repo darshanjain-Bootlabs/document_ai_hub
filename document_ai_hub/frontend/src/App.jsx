@@ -41,7 +41,6 @@ function App() {
         />
       </Route>
 
-      {/* Default route */}
       <Route path="/" element={<Navigate to="/login" replace />} />
     </Routes>
   );

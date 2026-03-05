@@ -26,7 +26,6 @@ export default function Login() {
           "Content-Type": "application/x-www-form-urlencoded",
         },
       });
-
       const token = response.data.access_token;
       localStorage.setItem("access_token", token);
 

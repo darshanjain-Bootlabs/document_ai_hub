@@ -1,0 +1,40 @@
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+.env/
+
+# Environment files
+.env
+.env.*
+
+# Git
+.git
+.gitignore
+
+# Tests
+tests/
+pytest.ini
+
+# Mac / OS
+.DS_Store
+
+# Logs
+*.log
+
+# Node (if accidentally present)
+node_modules/
+
+# Frontend folder (IMPORTANT - backend image doesn't need frontend)
+frontend/
+
+# Docker compose (not needed inside image)
+docker-compose.yml
+
+# Local data
+data/

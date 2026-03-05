@@ -1,0 +1,21 @@
+# Node modules
+node_modules/
+
+# Build output (Docker builds fresh)
+dist/
+
+# Git
+.git
+.gitignore
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Env files
+.env
+.env.*
+
+# OS
+.DS_Store

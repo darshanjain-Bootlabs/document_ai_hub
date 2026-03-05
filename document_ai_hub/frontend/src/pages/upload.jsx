@@ -10,6 +10,7 @@ export default function Upload() {
 
   const upload_file = async (e) => {
     e.preventDefault();
+
     if (!file) {
       setStatus("Please select a file to upload.");
       return;
@@ -17,25 +18,31 @@ export default function Upload() {
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("file_domain", fileDomain);
+
     try {
       setStatus("Uploading...");
-      const token =
-        localStorage.getItem("access_token") || localStorage.getItem("token");
+
+      const token = localStorage.getItem("access_token");
+
       const headers = {};
       if (token) headers.Authorization = `Bearer ${token}`;
 
-      const response = await api.post("/upload/upload", formData, {
+      const response = await api.post("/upload/upload/", formData, {
         params: { file_domain: fileDomain },
         headers,
       });
 
       console.log("upload response:", response);
+
       setStatus(
-        `Uploaded successfully. Chunks: ${response.data?.chunks_created ?? "unknown"}`,
+        `Uploaded successfully. Chunks: ${
+          response.data?.chunks_created ?? "unknown"
+        }`,
       );
-      navigate("/chat");
+
+      navigate("/rag");
     } catch (error) {
+      console.error(error.response?.data || error);
       setStatus("Error uploading file.");
     }
   };

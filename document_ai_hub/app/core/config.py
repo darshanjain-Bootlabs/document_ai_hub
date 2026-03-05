@@ -8,10 +8,15 @@ class Settings(BaseSettings):
     DATABASE_URL: str
     GROQ_API_KEY: str
     JWT_SECRET_KEY: str
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_DB: str
+    CHROMA_HOST: str = "chroma"
+    CHROMA_PORT: int = 8000
     class Config:
         env_file = ".env"
+        extra = "ignore"
 settings = Settings()
-
 
 ROLE_DOMAIN_ACCESS = {
     "doctor": ["healthcare"],

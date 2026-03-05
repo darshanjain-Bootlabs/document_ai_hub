@@ -2,12 +2,13 @@ from fastapi import APIRouter, Depends, UploadFile, File, HTTPException,Request
 from pathlib import Path
 import tempfile
 import shutil
-
+#Database
 from sqlalchemy.orm import Session
-
+from app.database.model import DocumentMetaData, UserChunk
+#Rate Limiting
 from slowapi import Limiter
 from slowapi.util import get_remote_address
-
+#Services and Utilities
 from app.services.vector_service import inject_document
 from app.common_utils.pdf_utils import text_from_pdf
 from app.common_utils.txt_utils import text_from_txt
@@ -67,3 +68,21 @@ async def upload_file(request: Request, file: UploadFile = File(...), file_domai
     except Exception as e:
         raise HTTPException(status_code=500, detail="Database Error: " + str(e))
     return {"filename": file.filename, "file_domain": file_domain, "chunks_created": chunks}
+
+
+@upload_router.get("/docinfo")
+async def get_doc_info(current_user = Depends(get_current_user), db: Session = Depends(get_db)):
+    if current_user["role"] == "admin":
+        doc = db.query(DocumentMetaData).all()
+    else:
+        doc = db.query(DocumentMetaData).filter(DocumentMetaData.uploaded_by == current_user["email"]).all()
+    return {
+    "documents": [
+        {
+            "id": d.id,
+            "document_name": d.document_name,
+            "file_domain": d.file_domain,
+            "uploaded_by": d.uploaded_by
+        } for d in doc
+    ]
+}

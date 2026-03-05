@@ -1,16 +1,16 @@
 import { useState } from "react";
 
 const Chat = () => {
-  const [question, setQuestion] = useState("");
   const [format, setFormat] = useState("markdown");
   const [docDomain, setDocDomain] = useState("");
   const [mode, setMode] = useState("general");
 
-  const [answer, setAnswer] = useState("");
+  const [input, setInput] = useState("");
+  const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const askQuestion = async () => {
-    if (!question.trim()) {
+    if (!input.trim()) {
       alert("Please enter a question");
       return;
     }
@@ -20,15 +20,25 @@ const Chat = () => {
       return;
     }
 
+    const userMessage = input;
+
+    // 1️⃣ Push user message into chat history
+    setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
+
+    // 2️⃣ Clear input box immediately
+    setInput("");
+
     setLoading(true);
-    setAnswer("");
 
     try {
       const token =
         localStorage.getItem("access_token") || localStorage.getItem("token");
 
       if (!token) {
-        setAnswer("Not authenticated — please log in");
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: "Not authenticated — please log in" },
+        ]);
         return;
       }
 
@@ -39,7 +49,7 @@ const Chat = () => {
 
       const response = await fetch(
         `http://127.0.0.1:8000/rag/rag` +
-          `?query=${encodeURIComponent(question)}` +
+          `?query=${encodeURIComponent(userMessage)}` +
           `&response_format=${format}` +
           `&doc_domain=${docDomain}` +
           `&mode=${mode}`,
@@ -50,24 +60,30 @@ const Chat = () => {
         },
       );
 
-      if (response.status === 401) {
-        localStorage.removeItem("access_token");
-        setAnswer(
-          "Unauthorized — token missing or expired. Please log in again.",
-        );
-        return;
-      }
-
       if (!response.ok) {
         const text = await response.text();
-        setAnswer(`Backend error ${response.status}: ${text}`);
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: `Backend error ${response.status}: ${text}`,
+          },
+        ]);
         return;
       }
 
       const data = await response.json();
-      setAnswer(data.answer || "No answer returned");
+
+      // 3️⃣ Push assistant response into chat history
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: data.answer || "No answer returned" },
+      ]);
     } catch (error) {
-      setAnswer("Error calling backend");
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: "Error calling backend" },
+      ]);
     } finally {
       setLoading(false);
     }
@@ -122,28 +138,31 @@ const Chat = () => {
       </div>
 
       <div className="flex-1 bg-white rounded-xl shadow-lg p-6 overflow-y-auto space-y-4">
-        {question && (
-          <div className="flex justify-end">
-            <div className="bg-blue-600 text-white px-4 py-2 rounded-2xl max-w-lg">
-              {question}
+        {messages.map((msg, index) => (
+          <div
+            key={index}
+            className={`flex ${
+              msg.role === "user" ? "justify-end" : "justify-start"
+            }`}
+          >
+            <div
+              className={`px-4 py-2 rounded-2xl max-w-lg whitespace-pre-wrap ${
+                msg.role === "user"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 text-gray-800"
+              }`}
+            >
+              {msg.content}
             </div>
           </div>
-        )}
+        ))}
 
-        {loading ? (
+        {loading && (
           <div className="flex justify-start">
             <div className="bg-gray-200 text-gray-700 px-4 py-2 rounded-2xl">
               Thinking...
             </div>
           </div>
-        ) : (
-          answer && (
-            <div className="flex justify-start">
-              <div className="bg-gray-100 text-gray-800 px-4 py-3 rounded-2xl max-w-lg whitespace-pre-wrap">
-                {answer}
-              </div>
-            </div>
-          )
         )}
       </div>
 
@@ -151,8 +170,8 @@ const Chat = () => {
         <textarea
           rows={2}
           placeholder="Ask a question about your documents..."
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
           className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
         />
 
