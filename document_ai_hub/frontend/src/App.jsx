@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/login";
 import Upload from "./pages/upload";
 import Chat from "./pages/chat";
+import Signup from "./pages/signup";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardLayout from "./components/DashboardLayout";
@@ -11,12 +12,13 @@ function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
 
       <Route element={<DashboardLayout />}>
         <Route
           path="/upload"
           element={
-            <ProtectedRoute allowedRoles={["admin"]}>
+            <ProtectedRoute allowedRoles={["admin", "user"]}>
               <Upload />
             </ProtectedRoute>
           }
@@ -33,6 +35,7 @@ function App() {
                 "business_user",
                 "student",
                 "bank_officer",
+                "user",
               ]}
             >
               <Chat />

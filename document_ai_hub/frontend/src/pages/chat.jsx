@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
 
 const Chat = () => {
   const [format, setFormat] = useState("markdown");
@@ -48,15 +49,16 @@ const Chat = () => {
       };
 
       const response = await fetch(
-        `http://127.0.0.1:8000/rag/rag` +
+        `http://localhost:8000/rag/rag` +
           `?query=${encodeURIComponent(userMessage)}` +
           `&response_format=${format}` +
           `&doc_domain=${docDomain}` +
           `&mode=${mode}`,
         {
           method: "POST",
-          headers,
-          body: JSON.stringify({}),
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
       );
 
@@ -74,7 +76,6 @@ const Chat = () => {
 
       const data = await response.json();
 
-      // 3️⃣ Push assistant response into chat history
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: data.answer || "No answer returned" },
@@ -152,7 +153,11 @@ const Chat = () => {
                   : "bg-gray-100 text-gray-800"
               }`}
             >
-              {msg.content}
+              {format === "markdown" ? (
+                <ReactMarkdown>{msg.content}</ReactMarkdown>
+              ) : (
+                msg.content
+              )}
             </div>
           </div>
         ))}

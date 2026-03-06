@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  const token = localStorage.getItem("access_token") || localStorage.getItem("token");
+  const token =
+    localStorage.getItem("access_token") || localStorage.getItem("token");
   const role = localStorage.getItem("role");
 
   if (!token) {
@@ -15,48 +16,50 @@ const Dashboard = () => {
     localStorage.clear();
     navigate("/login");
   };
-    return (
-        <div style={{ maxWidth: "600px", margin: "60px auto", fontFamily: "Arial" }}>
-        <h2>Document AI Dashboard</h2>
+  return (
+    <div
+      style={{ maxWidth: "600px", margin: "60px auto", fontFamily: "Arial" }}
+    >
+      <h2>Document AI Dashboard</h2>
 
-        <p>
-            <strong>Role:</strong> {role}
-        </p>
+      <p>
+        <strong>Role:</strong> {role}
+      </p>
 
-        <hr />
+      <hr />
 
-        {(role === "admin" || role === "researcher") && (
-            <button
-            style={{ width: "100%", padding: "12px", marginBottom: "10px" }}
-            onClick={() => navigate("/upload")}
-            >
-            Upload Documents
-            </button>
-        )}
-
+      {(role === "admin" || role === "researcher" || role === "user") && (
         <button
-            style={{ width: "100%", padding: "12px", marginBottom: "10px" }}
-            onClick={() => navigate("/chat")}
+          style={{ width: "100%", padding: "12px", marginBottom: "10px" }}
+          onClick={() => navigate("/upload")}
         >
-            Ask Questions (RAG)
+          Upload Documents
         </button>
+      )}
 
-        <hr />
+      <button
+        style={{ width: "100%", padding: "12px", marginBottom: "10px" }}
+        onClick={() => navigate("/chat")}
+      >
+        Ask Questions (RAG)
+      </button>
 
-        <button
-            style={{
-            width: "100%",
-            padding: "10px",
-            background: "crimson",
-            color: "white",
-            border: "none",
-            }}
-            onClick={logout}
-        >
-            Logout
-        </button>
-        </div>
-    );
+      <hr />
+
+      <button
+        style={{
+          width: "100%",
+          padding: "10px",
+          background: "crimson",
+          color: "white",
+          border: "none",
+        }}
+        onClick={logout}
+      >
+        Logout
+      </button>
+    </div>
+  );
 };
 
 export default Dashboard;
