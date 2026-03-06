@@ -25,8 +25,8 @@ jobs:
       - name: Build and push Backend
         uses: docker/build-push-action@v5
         with:
-          context: ./document_ai_hub/app
-          file: ./document_ai_hub/Dockerfile
+          context: ./document_ai_hub
+          file: ./document_ai_hub/app/Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/docuchat-backend:latest
 
