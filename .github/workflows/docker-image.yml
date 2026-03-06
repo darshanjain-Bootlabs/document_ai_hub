@@ -1,42 +1,39 @@
-name: Build and Push Docker Images for Document AI Hub
+name: Build and Push Docker Images
 
 on:
-    push:
-        branches:
-            - main
-    pull_request:
-        branches:
-            - main
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-    build: 
-        runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-            -name: login to docker hub
-             uses: docker/login-action@v3
-             with:
-                username: ${{ secrets.DOCKERHUB_USERNAME }}
-                password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-            -name: Build and push Backend
-             uses: docker/build-push-action@v5
-             with:
-                context: ./document_ai_hub/app
-                file: ./document_ai_hub/Dockerfile
-                push: true
-                tags: ${{ secrets.DOCKERHUB_USERNAME }}/docuchat-backend:latest
+      - name: Build and push Backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./document_ai_hub/app
+          file: ./document_ai_hub/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/docuchat-backend:latest
 
-            -name: Build and push Frontend
-                uses: docker/build-push-action@v5
-                with:
-                    context: ./document_ai_hub/frontend
-                    file: ./document_ai_hub/frontend/Dockerfile
-                    push: true
-                    tags: ${{ secrets.DOCKERHUB_USERNAME }}/docuchat-frontend:latest
-
-
-           
+      - name: Build and push Frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./document_ai_hub/frontend
+          file: ./document_ai_hub/frontend/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/docuchat-frontend:latest
