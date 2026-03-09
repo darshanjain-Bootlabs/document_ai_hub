@@ -88,7 +88,7 @@ def generate_answer(query: str, response_format: str, doc_domain: str, user_role
     if not authorize_access(user_role, doc_domain, mode):
         raise Exception("Unauthorized access")
     else:
-        docs = similarity_search(query, k=3)
+        docs = similarity_search(query, k=3, file_domain=doc_domain)
         context = build_context(docs)
 
         prompt = build_prompt(query, context, response_format, mode)
