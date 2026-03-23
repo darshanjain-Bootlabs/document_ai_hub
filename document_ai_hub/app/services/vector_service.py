@@ -78,3 +78,9 @@ class VectorService:
             )
 
         return self.vector_store.similarity_search(query, k=k)
+
+    def delete_document(self, source: str) -> None:
+        """
+        Delete all chunks for a given document source.
+        """
+        self.vector_store.delete(where={"source": source})

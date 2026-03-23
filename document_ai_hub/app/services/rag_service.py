@@ -126,10 +126,12 @@
 
 
 
+import json
+
 from groq import Groq
 
 from app.services.user_service import authorize_access
-from document_ai_hub.app.services.vector_service import VectorService
+from app.services.vector_service import VectorService
 
 
 class RAGService:
@@ -147,6 +149,57 @@ class RAGService:
         vector_service = VectorService.create_default()
 
         return cls(client, model_name, vector_service)
+    
+    def suggested_questions(self, text: str, num_suggestions: int = 4) -> list:
+        # 1. Update the prompt to be explicit about the structure
+        prompt = (
+            f"Based on the following document content, suggest {num_suggestions} "
+            f"insightful questions. Return ONLY a JSON object with a key 'questions' "
+            f"containing a list of strings.\n\nContent: {text[:4000]}" # Truncate to save tokens
+        )
+        
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model_name,
+                messages=[
+                    {
+                        "role": "system", 
+                        "content": "You are a helpful assistant that outputs only JSON."
+                    },
+                    {"role": "user", "content": prompt}
+                ],
+                response_format={"type": "json_object"}, # Forces JSON mode
+                temperature=0.3,
+                max_tokens=300,
+            )
+
+            raw = response.choices[0].message.content.strip()
+            
+            # 2. Robust Cleaning
+            if "```" in raw:
+                raw = raw.split("```")[1]
+                if raw.startswith("json"):
+                    raw = raw[4:]
+            raw = raw.strip()
+
+            # 3. Safe Parsing
+            data = json.loads(raw)
+            
+            # Handle different possible JSON structures the LLM might hallucinate
+            if isinstance(data, dict):
+                # Look for any list inside the dict (usually 'questions' or 'suggestions')
+                for value in data.values():
+                    if isinstance(value, list):
+                        return [str(q) for q in value][:num_suggestions]
+            elif isinstance(data, list):
+                return [str(q) for q in data][:num_suggestions]
+
+        except (json.JSONDecodeError, Exception) as e:
+            print(f"Error parsing suggested questions: {e}")
+            # Fallback: if JSON fails, maybe try a simple split if 'raw' has content
+            return []
+
+        return []
 
     @staticmethod
     def build_context(docs) -> str:

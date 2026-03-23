@@ -1,17 +1,26 @@
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
+import { useLocation } from "react-router-dom";
 
 const Chat = () => {
+  const location = useLocation();
+  const incomingQuestions = location.state?.suggestedQuestions || [];
+  const incomingDomain = location.state?.fileDomain || "";
+
   const [format, setFormat] = useState("markdown");
-  const [docDomain, setDocDomain] = useState("");
+  const [docDomain, setDocDomain] = useState(incomingDomain);
   const [mode, setMode] = useState("general");
 
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const askQuestion = async () => {
-    if (!input.trim()) {
+  const [chipsVisible, setChipsVisible] = useState(true);
+
+  const askQuestion = async (overrideQuestion = null) => {
+    const usermessage = overrideQuestion || input;
+
+    if (!usermessage.trim()) {
       alert("Please enter a question");
       return;
     }
@@ -21,12 +30,12 @@ const Chat = () => {
       return;
     }
 
-    const userMessage = input;
+    setChipsVisible(false);
 
-    // 1️⃣ Push user message into chat history
-    setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
+    // Push user message into chat history
+    setMessages((prev) => [...prev, { role: "user", content: usermessage }]);
 
-    // 2️⃣ Clear input box immediately
+    // Clear input box immediately
     setInput("");
 
     setLoading(true);
@@ -50,7 +59,7 @@ const Chat = () => {
 
       const response = await fetch(
         `http://localhost:8000/rag/rag` +
-          `?query=${encodeURIComponent(userMessage)}` +
+          `?query=${encodeURIComponent(usermessage)}` +
           `&response_format=${format}` +
           `&doc_domain=${docDomain}` +
           `&mode=${mode}`,
@@ -170,6 +179,26 @@ const Chat = () => {
           </div>
         )}
       </div>
+
+      {/*Suggested question chips — shown only before first message */}
+      {chipsVisible && incomingQuestions.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          <span className="text-xs text-gray-400 w-full mb-1">
+            Suggested questions
+          </span>
+          {incomingQuestions.map((q, i) => (
+            <button
+              key={i}
+              onClick={() => askQuestion(q)}
+              className="text-sm bg-blue-50 text-blue-700 border border-blue-200
+                         rounded-full px-4 py-1.5 hover:bg-blue-100
+                         transition cursor-pointer"
+            >
+              {q}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="mt-4 flex gap-3">
         <textarea

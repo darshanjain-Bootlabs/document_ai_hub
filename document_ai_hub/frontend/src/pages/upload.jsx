@@ -34,13 +34,20 @@ export default function Upload() {
 
       console.log("upload response:", response);
 
+      const suggestedQuestions = response.data?.suggested_questions || [];
+
       setStatus(
         `Uploaded successfully. Chunks: ${
           response.data?.chunks_created ?? "unknown"
         }`,
       );
 
-      navigate("/rag");
+      navigate("/rag", {
+        state: {
+          suggestedQuestions,
+          fileDomain,
+        },
+      });
     } catch (error) {
       console.error(error.response?.data || error);
       setStatus("Error uploading file.");
