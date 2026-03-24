@@ -28,7 +28,7 @@ jobs:
           context: ./document_ai_hub
           file: ./document_ai_hub/app/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/document_ai_hub_backend:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/document_ai_hub-backend:latest
 
       - name: Build and push Frontend
         uses: docker/build-push-action@v5
@@ -36,4 +36,4 @@ jobs:
           context: ./document_ai_hub/frontend
           file: ./document_ai_hub/frontend/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/document_ai_hub_frontend:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/document_ai_hub-frontend:latest
