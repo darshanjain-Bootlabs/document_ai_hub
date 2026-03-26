@@ -22,7 +22,7 @@ services:
       - "8001:8000"
 
   backend:
-  image: ${DOCKERHUB_USERNAME}/document_ai_hub-backend:latest
+    image: ${DOCKERHUB_USERNAME}/document_ai_hub-backend:latest
     container_name: document_ai_hub_backend
     restart: always
     depends_on:
@@ -45,7 +45,7 @@ services:
       - chroma_data:/app/data/chroma
 
   frontend:
-  image: ${DOCKERHUB_USERNAME}/document_ai_hub-frontend:latest
+    image: ${DOCKERHUB_USERNAME}/document_ai_hub-frontend:latest
     container_name: document_ai_hub_frontend
     restart: always
     depends_on:

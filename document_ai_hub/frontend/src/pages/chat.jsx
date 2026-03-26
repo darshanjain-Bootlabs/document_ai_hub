@@ -210,7 +210,7 @@ const Chat = () => {
         />
 
         <button
-          onClick={askQuestion}
+          onClick={() => askQuestion(input)}
           disabled={loading}
           className="bg-blue-600 text-white px-6 rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
         >
